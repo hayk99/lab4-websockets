@@ -56,14 +56,34 @@ public class ElizaServerTest {
 	}
 
 	@Test(timeout = 1000)
-	@Ignore
 	public void onChat() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
 		// COMPLETE ME!!
+        Session session = null;
+
 		List<String> list = new ArrayList<>();
 		ClientEndpointConfig configuration = ClientEndpointConfig.Builder.create().build();
 		ClientManager client = ClientManager.createClient();
-		client.connectToServer(new ElizaEndpointToComplete(list), configuration, new URI("ws://localhost:8025/websockets/eliza"));
+		session = client.connectToServer(new ElizaEndpointToComplete(list), configuration, new URI(
+		        "ws" +
+                "://localhost:8025/websockets/eliza"));
 		// COMPLETE ME!!
+        //nos aseguramos de lista vacia
+        assertEquals(0, list.size());
+        session.getAsyncRemote().sendText("I think you're my doc");
+        Thread.sleep(50);
+        session.getAsyncRemote().sendText("i want to say sorry");
+        Thread.sleep(50);
+
+        assertEquals(7, list.size());
+        //esperamos a que nos de su mensaje de bienvenida definido en ElizaServerEndpoint
+        assertEquals( "The doctor is in.", list.get(0));
+        assertEquals( "What's on your mind?", list.get(1));
+        assertEquals("---", list.get(2));
+
+        assertEquals("We were discussing you, not me.",list.get(3));
+
+        assertEquals("Please don't apologize.", list.get(5));
+
 	}
 
 	@After
